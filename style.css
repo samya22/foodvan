@@ -5,6 +5,7 @@ body {
     text-rendering: optimizeLegibility !important;
     background: #f3f3f5;
     scroll-behavior: smooth;
+    /* #09b344; */
 }
 
 .body-fixed {
@@ -107,9 +108,13 @@ ul {
 }
 
 .main-navigation .menu li a:hover, .main-navigation .menu li .active-menu, .main-navigation .menu .sub-menu li .active-sub-menu {
-    color: #ff8243;
-    background: #f3f3f5;
-    box-shadow: inset 8px 8px 12px #e2e2e2, inset -8px -8px 12px #ffffff;
+    color: #09b344;
+    text-decoration: underline;
+    text-decoration-thickness: 20px;
+    text-decoration: solid;
+    text-decoration-color: #09b344;
+    text-underline-offset: 5px;
+    /* box-shadow: inset 8px 8px 12px #eeeeee, inset -8px -8px 12px #ffffff; */
 }
 
 .header-right {
@@ -464,7 +469,7 @@ ul {
     height: 100%;
     background-size: cover;
     background-position: center;
-    animation: biani 4.5s linear infinite alternate;
+    /* animation: biani 4.5s linear infinite alternate; */
     box-shadow: 0 0px 20px rgba(36, 39, 37, 0.3);
 }
 
