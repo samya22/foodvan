@@ -27,7 +27,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  display: none;
+
 }
 
 .flex {

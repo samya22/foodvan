@@ -1,8 +1,5 @@
 
 <?php
-session_start();
-
-
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // Database
@@ -18,34 +15,30 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $confirm = trim($_POST['confirm-pass']);
 
-    if($password !== $confirm || preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/", $email)==false){
-        $_SESSION['warningsignup'] = true;
-        header('Location: signup.php');
-        exit();
-    }
-    
-
-    
-    $user_id = uniqid('user_');
+    $stmt = $conn->prepare("SELECT admin_email FROM admins WHERE admin_email = ? AND admin_password = ?");
+    $stmt->bind_param("ss", $email, $password); 
+    $stmt->execute();
+    $result = $stmt->get_result();
 
 
-    $stmt = $conn->prepare("INSERT INTO users (user_id, user_email, user_password) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $user_id, $email, $password);
-
-   
-    if ($stmt->execute()) {
+    if ($result->num_rows > 0) {
         
+        $_SESSION['admin'] = $email;
+
+        // Redirect 
+        header("Location: index.html");
+        echo "<script>console.log('success');</script>";
+        exit();
     } else {
-        header("Location: logout.php");
-        header("Location: signup.php");
+        header("Location: loginauth.php");
+        exit();
     }
 
     $stmt->close();
-
 
 $conn->close();
 }
@@ -133,14 +126,10 @@ if(!isset($_SESSION['access_token']))
      </svg>
      <span>Google</span>
    </button>';
-}
  
-// if($_SESSION['throughprofile'] == false){
-   
-//   $_SESSION['user'] = true;
-// }
 
-$_SESSION['user'] = true;
+  $_SESSION['user'] = true;
+}
 
 ?>
 
@@ -351,9 +340,9 @@ $_SESSION['user'] = true;
   
 <div class="form_container">
   <div class="title_container">
-  <p class="title">Sign In</p>
-    <form action="profile.php" method="post">
-    <span class="subtitle">Get started with our app, just create an account and enjoy the experience.</span>
+  <p class="title">Admin</p>
+    <form action="admin.php" method="post">
+    <span class="subtitle">Get started with website, just log into an account and manage your tasks.</span>
   </div>
   <br>
   <div class="input_container">
@@ -371,41 +360,21 @@ $_SESSION['user'] = true;
       <path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="#141B34" d="M6 9V6.5C6 4.01472 8.01472 2 10.5 2C12.9853 2 15 4.01472 15 6.5V9"></path>
       <path fill="#141B34" d="M21.2046 15.1045L20.6242 15.6956V15.6956L21.2046 15.1045ZM21.4196 16.4767C21.7461 16.7972 22.2706 16.7924 22.5911 16.466C22.9116 16.1395 22.9068 15.615 22.5804 15.2945L21.4196 16.4767ZM18.0228 15.1045L17.4424 14.5134V14.5134L18.0228 15.1045ZM18.2379 18.0387C18.5643 18.3593 19.0888 18.3545 19.4094 18.028C19.7299 17.7016 19.7251 17.1771 19.3987 16.8565L18.2379 18.0387ZM14.2603 20.7619C13.7039 21.3082 12.7957 21.3082 12.2394 20.7619L11.0786 21.9441C12.2794 23.1232 14.2202 23.1232 15.4211 21.9441L14.2603 20.7619ZM12.2394 20.7619C11.6914 20.2239 11.6914 19.358 12.2394 18.82L11.0786 17.6378C9.86927 18.8252 9.86927 20.7567 11.0786 21.9441L12.2394 20.7619ZM12.2394 18.82C12.7957 18.2737 13.7039 18.2737 14.2603 18.82L15.4211 17.6378C14.2202 16.4587 12.2794 16.4587 11.0786 17.6378L12.2394 18.82ZM14.2603 18.82C14.8082 19.358 14.8082 20.2239 14.2603 20.7619L15.4211 21.9441C16.6304 20.7567 16.6304 18.8252 15.4211 17.6378L14.2603 18.82ZM20.6242 15.6956L21.4196 16.4767L22.5804 15.2945L21.785 14.5134L20.6242 15.6956ZM15.4211 18.82L17.8078 16.4767L16.647 15.2944L14.2603 17.6377L15.4211 18.82ZM17.8078 16.4767L18.6032 15.6956L17.4424 14.5134L16.647 15.2945L17.8078 16.4767ZM16.647 16.4767L18.2379 18.0387L19.3987 16.8565L17.8078 15.2945L16.647 16.4767ZM21.785 14.5134C21.4266 14.1616 21.0998 13.8383 20.7993 13.6131C20.4791 13.3732 20.096 13.1716 19.6137 13.1716V14.8284C19.6145 14.8284 19.619 14.8273 19.6395 14.8357C19.6663 14.8466 19.7183 14.8735 19.806 14.9391C19.9969 15.0822 20.2326 15.3112 20.6242 15.6956L21.785 14.5134ZM18.6032 15.6956C18.9948 15.3112 19.2305 15.0822 19.4215 14.9391C19.5091 14.8735 19.5611 14.8466 19.5879 14.8357C19.6084 14.8273 19.6129 14.8284 19.6137 14.8284V13.1716C19.1314 13.1716 18.7483 13.3732 18.4281 13.6131C18.1276 13.8383 17.8008 14.1616 17.4424 14.5134L18.6032 15.6956Z"></path>
     </svg>
-    <input placeholder="Password" title="Inpit title" name="password"  type="password" class="input_field" id="password_field">
+    <input placeholder="Password" title="Inpit title" name="password" type="password" class="input_field" id="password_field">
   </div>
-
-  <span class="subtitle" id="warn" style="color:red; display:none;"><i class="fa-solid fa-triangle-exclamation"></i> Invalid Email and Password</span>
- 
   <button title="Sign In" type="submit" class="sign-in_btn">
     <span>Sign In</span>
   </button>
 </form>
-<button title="Admin" type="submit" class="sign-in_btn" onclick="window.location.href='admin.php'">
-    <span>Admin</span>
-  </button>
-<span class="subtitle">Don't have an Account? <a href="signup.php">Signup</a></span>
+<span class="subtitle">User sign In? <a href="loginauth.php">Sign In</a></span>
   <div class="separator">
     <hr class="line">
     <span>Or</span>
     <hr class="line">
   </div>
- <?php
-    echo $login_button;
- ?>
   <p class="note">Terms of use &amp; Conditions</p>
 </div>
 
-<?php
-    if (isset($_SESSION['warning']) && $_SESSION['warning'] == true) {
-        echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('warn').style.display = 'block';
-            });
-        </script>";
-        // Clear the warning session variable so it doesn’t persist on refresh
-        unset($_SESSION['warning']);
-    }
-    ?>
 
 
 <script src="main.js"></script>

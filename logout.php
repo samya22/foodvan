@@ -2,6 +2,7 @@
 session_start();
 session_unset();
 session_destroy();
-header("Location: index.html");
+$_SESSION['tick'] = false;
+header("Location: profile.php");
 
 ?>
