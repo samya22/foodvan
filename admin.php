@@ -30,7 +30,7 @@ if ($conn->connect_error) {
         $_SESSION['admin'] = $email;
 
         // Redirect 
-        header("Location: index.html");
+        header("Location: index.php");
         echo "<script>console.log('success');</script>";
         exit();
     } else {

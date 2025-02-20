@@ -1,3 +1,46 @@
+<?php
+session_start();
+ 
+
+// Check if the user is logged in and email is set in the session
+if (isset($_SESSION['useremail'])) {
+    $email = $_SESSION['useremail'];
+
+    // Database connection
+    $host = "localhost"; // Replace with your database host
+    $username = "root"; // Replace with your database username
+    $password = "abhi879687#"; // Replace with your database password
+    $database = "spicymonk"; // Replace with your database name
+
+    $conn = new mysqli($host, $username, $password, $database);
+
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Query to get the total items in the cart for the logged-in user
+    $sql = "SELECT SUM(quantity) AS total_items FROM cart WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Fetch the result
+    if ($row = $result->fetch_assoc()) {
+        $totalItems = $row['total_items'] ? $row['total_items'] : 0; // If no items, set total to 0
+        $_SESSION['cartquantity']=$totalItems;
+    }
+
+    // Close the connection
+    $stmt->close();
+    $conn->close();
+}
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,12 +63,12 @@
 </head>
 
 <body class="body-fixed">
-    <header class="site-header">
+    <!-- <header class="site-header">
         <div class="container">
             <div class="row"> 
                 <div class="col-lg-2">
                     <div class="header-logo">
-                        <a href="index.html">
+                        <a href="index.php">
                             <img src="spicymonk-logo.png" width="160" height="36" alt="Logo">
                         </a>
                     </div>
@@ -35,7 +78,7 @@
                         <button class="menu-toggle"><span></span><span></span></button>
                         <nav class="header-menu">
                             <ul class="menu food-nav-menu">
-                                <li><a href="index.html">Home</a></li>
+                                <li><a href="index.php">Home</a></li>
                                 <li><a href="menu.php">Menu</a></li>
                                 <li><a href="location.php">Location</a></li>
                                 <li><a href="about.php">About</a></li>
@@ -52,7 +95,7 @@
                             </form>
                             <a href="javascript:void(0)" class="header-btn header-cart">
                                 <i class="uil uil-shopping-bag"></i>
-                                <span class="cart-number">3</span>
+                                <span class="cart-number">?php if(isset($_SESSION['cartquantity'])){echo $_SESSION['cartquantity'];}else{echo "0";} ?></span>
                             </a>
                             <a href="profile.php" class="header-btn">
                                 <i class="uil uil-user-md"></i>
@@ -62,7 +105,11 @@
                 </div>
             </div>
         </div>
-    </header>
+    </header> -->
+    <?php
+include 'header.php';
+?>
+
 
     <!-- Backround Move Image -->
     <div id="viewport">
@@ -109,16 +156,16 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="sec-title text-center mb-5 ">
-                                <p class="sec-sub-title mb-3 animate__animated"  data-animation="animate__fadeInRight">About Us</p>
-                                <h2 class="h2-title animate__animated"  data-animation="animate__fadeInRight">Discover our <span>restaurant story</span></h2>
-                                <div class="sec-title-shape mb-4">
+                                <p class="sec-sub-title mb-3 ">About Us</p>
+                                <h2 class="h2-title animate__animated"  data-animation="animate__fadeInUp">Discover our <span>restaurant story</span></h2>
+                                <div class="sec-title-shape mb-4 animate__animated"  data-animation="animate__fadeInUp">
                                     <img src="assets/images/green-line.png" alt="" width="50%" height="50%">
                                 </div>
-                                <p>We are dedicated to bringing you the finest quality and service with every bite. Our mission is to create unforgettable dining experiences by combining fresh ingredients, authentic recipes, and a passion for excellence. Your trust and satisfaction drive us to continuously improve and deliver more than just a meal—it’s a promise of care and commitment. From our kitchen to your table, we aim to exceed your expectations and leave you craving for more!</p>
+                                <p class="animate__animated"  data-animation="animate__fadeInUp">We are dedicated to bringing you the finest quality and service with every bite. Our mission is to create unforgettable dining experiences by combining fresh ingredients, authentic recipes, and a passion for excellence. Your trust and satisfaction drive us to continuously improve and deliver more than just a meal—it’s a promise of care and commitment. From our kitchen to your table, we aim to exceed your expectations and leave you craving for more!</p>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row ">
                         <div class="col-lg-8 m-auto">
                             <div class="about-video">
                                 <div class="about-video-img" style="background-image: url(assets/images/blog/b6.jpg);">
@@ -137,8 +184,8 @@
                             <div class="col-lg-12">
                                 <div class="sec-title text-center mb-5">
                                     <p class="sec-sub-title mb-3">our menu</p>
-                                    <h2 class="h2-title">Early mornings, <span>fresh meals & healthy vibe</span></h2>
-                                    <div class="sec-title-shape mb-4">
+                                    <h2 class="h2-title animate__animated"  data-animation="animate__fadeInUp">Early mornings, <span>fresh meals & healthy vibe</span></h2>
+                                    <div class="sec-title-shape mb-4 animate__animated"  data-animation="animate__fadeInUp">
                                         <img src="assets/images/green-line.png" alt="" width="50%" height="50%">
                                     </div>
                                 </div>
@@ -183,7 +230,7 @@
                                                     <b>Rs. 245</b>
                                                 </li>
                                                 <li>
-                                                    <button class="dish-add-btn">
+                                                    <button class="dish-add-btn" onclick="addToCart(this)">
                                                         <i class="uil uil-plus"></i>
                                                     </button>
                                                 </li>
@@ -224,7 +271,7 @@
                                                     <b>Rs. 219</b>
                                                 </li>
                                                 <li>
-                                                    <button class="dish-add-btn">
+                                                    <button class="dish-add-btn" onclick="addToCart(this)">
                                                         <i class="uil uil-plus"></i>
                                                     </button>
                                                 </li>
@@ -264,7 +311,7 @@
                                                     <b>Rs. 349</b>
                                                 </li>
                                                 <li>
-                                                    <button class="dish-add-btn">
+                                                    <button class="dish-add-btn" onclick="addToCart(this)">
                                                         <i class="uil uil-plus"></i>
                                                     </button>
                                                 </li>
@@ -305,7 +352,7 @@
                                                     <b>Rs. 249</b>
                                                 </li>
                                                 <li>
-                                                    <button class="dish-add-btn">
+                                                    <button class="dish-add-btn" onclick="addToCart(this)">
                                                         <i class="uil uil-plus"></i>
                                                     </button>
                                                 </li>
@@ -346,7 +393,7 @@
                                                     <b>Rs. 189</b>
                                                 </li>
                                                 <li>
-                                                    <button class="dish-add-btn">
+                                                    <button class="dish-add-btn" onclick="addToCart(this)">
                                                         <i class="uil uil-plus"></i>
                                                     </button>
                                                 </li>
@@ -386,7 +433,7 @@
                                                     <b>Rs. 159</b>
                                                 </li>
                                                 <li>
-                                                    <button class="dish-add-btn">
+                                                    <button class="dish-add-btn" onclick="addToCart(this)">
                                                         <i class="uil uil-plus"></i>
                                                     </button>
                                                 </li>
@@ -436,8 +483,8 @@
                         </div>
                         <div class="col-lg-7">
                             <div class="sec-text">
-                                <h2 class="xxl-title">Spaghetti Aglio e Olio</h2>
-                                <p>Noodles, a timeless classic, bring comfort and flavor to every bite. From steaming bowls of spicy ramen to stir-fried delights, they capture the essence of diverse cuisines worldwide. Crafted with the perfect balance of texture and taste, noodles adapt effortlessly to rich broths, vibrant vegetables, and savory sauces. Whether enjoyed as a quick snack or a hearty meal, they always deliver satisfaction. Light, versatile, and endlessly customizable, noodles are a canvas for culinary creativity that warms the soul and excites the palate."
+                                <h2 class="xxl-title animate__animated"  data-animation="animate__fadeInRight">Spaghetti Aglio e Olio</h2>
+                                <p class="animate__animated"  data-animation="animate__fadeInRight">Noodles, a timeless classic, bring comfort and flavor to every bite. From steaming bowls of spicy ramen to stir-fried delights, they capture the essence of diverse cuisines worldwide. Crafted with the perfect balance of texture and taste, noodles adapt effortlessly to rich broths, vibrant vegetables, and savory sauces. Whether enjoyed as a quick snack or a hearty meal, they always deliver satisfaction. Light, versatile, and endlessly customizable, noodles are a canvas for culinary creativity that warms the soul and excites the palate."
 
                                    <br><br> Every noodle dish tells a story of culture and tradition, uniting people through a shared love for simple yet extraordinary flavors. Whether topped with fresh herbs, tender proteins, or a spicy kick, noodles remain a universal favorite that’s both comforting and exciting</p>
 
@@ -452,9 +499,9 @@
                     <div class="row align-items-center">
                         <div class="col-lg-6 order-lg-1 order-2">
                             <div class="sec-text">
-                                <h2 class="xxl-title">Korean Spicy Stew </h2>
-                                <p>Stews, a timeless comfort food, bring warmth and flavor to every meal. From rich, hearty beef stews to spicy global variations, they embody the essence of home cooking and culinary tradition. Slow-cooked to perfection, stews blend tender meats, vibrant vegetables, and aromatic spices into a wholesome, satisfying dish. Whether served with rice, bread, or enjoyed on their own, they offer both nourishment and a sense of togetherness. Versatile and deeply flavorful, stews are a comforting classic that everyone loves.</p>
-                                <p>Each bowl of stew tells a story of heritage and love, combining simple ingredients into extraordinary flavors. Whether rustic and hearty or bold and spiced, stews remain a beloved favorite, perfect for sharing and savoring.</p>
+                                <h2 class="xxl-title animate__animated"  data-animation="animate__fadeInLeft">Korean Spicy Stew </h2>
+                                <p class="animate__animated"  data-animation="animate__fadeInLeft">Stews, a timeless comfort food, bring warmth and flavor to every meal. From rich, hearty beef stews to spicy global variations, they embody the essence of home cooking and culinary tradition. Slow-cooked to perfection, stews blend tender meats, vibrant vegetables, and aromatic spices into a wholesome, satisfying dish. Whether served with rice, bread, or enjoyed on their own, they offer both nourishment and a sense of togetherness. Versatile and deeply flavorful, stews are a comforting classic that everyone loves.</p>
+                                <p class="animate__animated"  data-animation="animate__fadeInLeft">Each bowl of stew tells a story of heritage and love, combining simple ingredients into extraordinary flavors. Whether rustic and hearty or bold and spiced, stews remain a beloved favorite, perfect for sharing and savoring.</p>
                             </div>
                         </div>
                         <div class="col-lg-6 order-lg-2 order-1">
@@ -481,8 +528,8 @@
                             <div class="col-lg-12">
                                 <div class="sec-title text-center mb-5">
                                     <p class="sec-sub-title mb-3">Openings</p>
-                                    <h2 class="h2-title">Serving You From</h2>
-                                    <div class="sec-title-shape mb-4">
+                                    <h2 class="h2-title animate__animated"  data-animation="animate__fadeInUp">Serving You From</h2>
+                                    <div class="sec-title-shape mb-4 animate__animated"  data-animation="animate__fadeInUp">
                                         <img src="assets/images/green-line.png" alt="" width="50%" height="50%">
                                     </div>
                                 </div>
@@ -568,8 +615,8 @@
                             <div class="col-lg-12">
                                 <div class="sec-title text-center mb-5">
                                     <p class="sec-sub-title mb-3">Our Team</p>
-                                    <h2 class="h2-title">Meet our Chefs</h2>
-                                    <div class="sec-title-shape mb-4">
+                                    <h2 class="h2-title animate__animated"  data-animation="animate__fadeInUp">Meet our Chefs</h2>
+                                    <div class="sec-title-shape mb-4 animate__animated"  data-animation="animate__fadeInUp">
                                         <img src="assets/images/green-line.png" alt="" width="50%" height="50%">
                                     </div>
                                 </div>
@@ -709,8 +756,8 @@
                             <div class="col-lg-12">
                                 <div class="sec-title text-center mb-5">
                                     <p class="sec-sub-title mb-3">What their Review</p>
-                                    <h2 class="h2-title">What our customers <span>say about us</span></h2>
-                                    <div class="sec-title-shape mb-4">
+                                    <h2 class="h2-title animate__animated"  data-animation="animate__fadeInUp">What our customers <span>say about us</span></h2>
+                                    <div class="sec-title-shape mb-4 animate__animated"  data-animation="animate__fadeInUp">
                                         <img src="assets/images/green-line.png" alt="" width="50%" height="50%">
                                     </div>
                                 </div>
@@ -720,7 +767,7 @@
                     </div>
                 </div>
 
-                <div class="testimonial-wrapper">
+                <div class="testimonial-wrapper animate__animated"  data-animation="animate__fadeIn">
                     <div class="testimonial-carousel">
                       <div class="testimonial">
                         <p>"The food was absolutely amazing! Fresh, flavorful, and satisfying."</p>
@@ -789,7 +836,7 @@
       <div class="footer-navbar-container">
         <div class="footer-company-details">
           <!-- <div class="footer-details-inner"> -->
-          <div class="footer-logo">
+          <div class="footer-logo animate__animated"  data-animation="animate__flip">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" color="#000" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -910,21 +957,32 @@
 
     
   <script>
-// document.addEventListener("DOMContentLoaded", function () {
-//     const observer = new IntersectionObserver((entries) => {
-//         entries.forEach((entry) => {
-//             if (entry.isIntersecting) {
-//                 entry.target.classList.add("animate__slideInLeft");
-//             } else {
-//                 entry.target.classList.remove("animate__slideInLeft"); // Reset animation for re-trigger
-//             }
-//         });
-//     });
 
-//     // Select all elements you want to animate
-//     const elements = document.querySelectorAll(".animate__animated");
-//     elements.forEach((el) => observer.observe(el));
-// });
+function addToCart(button) {
+    // Get the product title
+    const productTitle = button.closest(".dish-box").querySelector(".h3-title").textContent.trim();
+
+    // Send product title to the PHP script
+    fetch("addToCart.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            title: productTitle,
+        }),
+    })
+    .then((response) => response.text())
+    .then((data) => {
+        alert(data); // Show success or error message from PHP
+        window.location.href="index.php";
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
+}
+
+
 
 
 document.addEventListener("DOMContentLoaded", function () {

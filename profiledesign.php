@@ -3,7 +3,7 @@ session_start();
 
 if($_SESSION['tick'] == false)
 {
-    header("Location: index.html");
+    header("Location: index.php");
     exit();
 }
 $host = "localhost"; 
@@ -196,7 +196,7 @@ input.form-control::selection {
         <!-- Account page navigation-->
         <nav class="nav nav-borders">
             <a class="nav-link active ms-0" href="#"><i class="fa-solid fa-user"></i> Profile</a>
-            <a class="nav-link active ms-0" href="index.html"><i class="fa-solid fa-bell-concierge"></i> Home</a>
+            <a class="nav-link active ms-0" href="index.php"><i class="fa-solid fa-bell-concierge"></i> Home</a>
             <a class="nav-link active ms-0" href="logout.php"> <i class="fa-solid fa-circle-xmark"></i> Logout</a>
         </nav>
         <hr class="mt-0 mb-4">
