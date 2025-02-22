@@ -17,7 +17,7 @@ if (isset($_GET['order_id'], $_GET['email'], $_GET['username'], $_GET['amount'],
     $order_id = $_GET['order_id'];
     $useremail = $_GET['email'];
     $username = $_GET['username'];
-    $amount = $_GET['amount'];
+    $amount = $_GET['amount']/100;
     $contact = $_GET['contact'];
     $order_date = $_GET['order_date']; 
 

@@ -47,7 +47,10 @@ $order_id = "ODD0" . rand(100000, 999999); // Random Order ID
         // Initialize Razorpay API
         $api = new Api($keyId, $keySecret);
 
-        $amount = intval(round($_GET['amtvalue'] * 100));
+        $amtvalue = isset($_GET['amtvalue']) ? $_GET['amtvalue'] : '0';
+        $amtvalue = preg_replace('/[^0-9.]/', '', $amtvalue); // Remove non-numeric characters except decimals
+        $amount = intval(round(floatval($amtvalue) * 100));
+        
         // Order details
         $orderData = [
             'receipt'         => 'order_rcptid_11',
@@ -91,6 +94,7 @@ $order_id = "ODD0" . rand(100000, 999999); // Random Order ID
                         name: '$username', // Prefill customer name
                         email: '$userEmail', // Prefill customer email
                         contact: '$contact' // Prefill customer phone
+                        
                     },
                     theme: {
                         color: '#3399cc' // Checkout UI theme color
@@ -125,6 +129,7 @@ while ($cart_row = $cart_result->fetch_assoc()) {
     if ($product_data = $product_result->fetch_assoc()) {
         $cart_items[] = array_merge($cart_row, $product_data);
     }
+
 
     $product_stmt->close();
 }
@@ -164,7 +169,7 @@ $stmt->close();
                                                 <input type="text" class="form-control text-center" value="<?php echo $item['quantity']; ?>" disabled>
                                                 <button class="btn btn-outline-secondary px-3 rounded-end-3" onclick="updateQuantity(<?php echo $item['id']; ?>, 'increment')">+</button>
                                             </div>
-                                            <h5 class="price ms-auto mb-0">Rs. <?php echo number_format($item['price'] * $item['quantity'], 2); ?></h5>
+                                            <h5 class="price ms-auto mb-0" data-price="<?php echo $item['price']; ?>">Rs. <?php echo number_format($item['price'] * $item['quantity'], 2); ?></h5>
                                             <button class="btn btn-link text-danger p-0" onclick="deleteItem(<?php echo $item['id']; ?>)"><i class="bi bi-trash"></i></button>
                                         </div>
                                     </div>
@@ -191,7 +196,7 @@ $stmt->close();
                         <hr>
                         <div class="d-flex justify-content-between mb-4">
                             <strong>Total</strong>
-                            <strong style="position:absolute; right:85px;">Rs</strong>
+                            <!-- <strong style="position:absolute; right:85px;">Rs</strong> -->
                             <strong id="total" name="total">0.00</strong>
                         </div>
                         <button class="btn btn-primary w-100 py-3" name="submit" onclick="load()">Proceed to Checkout</button>
@@ -324,42 +329,48 @@ $stmt->close();
     <script>
         
         // Calculate and update totals
-        function updateTotals() {
-            let subtotal = 0;
-            document.querySelectorAll('.cart-item').forEach(item => {
-                const price = parseFloat(item.querySelector('.price').innerText.replace('Rs. ', ''));
-                subtotal += price;
-            });
-            const tax = subtotal * 0.12;
-            const total = subtotal + tax;
-            document.getElementById('subtotal').innerText = `Rs. ${subtotal.toFixed(2)}`;
-            document.getElementById('tax').innerText = `Rs. ${tax.toFixed(2)}`;
-            document.getElementById('total').innerText = `${total.toFixed(2)}`;
-        }
+   // Calculate and update totals
+    function updateTotals() {
+        let subtotal = 0;
+
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const price = parseFloat(item.querySelector('.price').getAttribute('data-price')); // Get the original price
+            const quantity = parseInt(item.querySelector('input').value); // Get the quantity
+            subtotal += price * quantity; // Multiply price by quantity
+        });
+
+        const tax = subtotal * 0.12;
+        const total = subtotal + tax;
+
+        document.getElementById('subtotal').innerText = `Rs. ${subtotal.toFixed(2)}`;
+        document.getElementById('tax').innerText = `Rs. ${tax.toFixed(2)}`;
+        document.getElementById('total').innerText = `Rs. ${total.toFixed(2)}`;
+    }
+
 
         // Update quantity
-        function updateQuantity(id, action) {
-            fetch('update_cart.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${id}&action=${action}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const cartItem = document.querySelector(`.cart-item[data-id="${id}"]`);
-                    cartItem.querySelector('input').value = data.quantity;
-                    cartItem.querySelector('.price').innerText = `${data.totalPrice}`;
-                    updateTotals();
-                } else {
-                    alert("Failed to update quantity!");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Error updating quantity!");
-            });
-        }
+        // function updateQuantity(id, action) {
+        //     fetch('update_cart.php', {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        //         body: `id=${id}&action=${action}`
+        //     })
+        //     .then(res => res.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             const cartItem = document.querySelector(`.cart-item[data-id="${id}"]`);
+        //             cartItem.querySelector('input').value = data.quantity;
+        //             cartItem.querySelector('.price').innerText = `${data.totalPrice}`;
+        //             updateTotals();
+        //         } else {
+        //             alert("Failed to update quantity!");
+        //         }
+        //     })
+        //     .catch(err => {
+        //         console.error(err);
+        //         alert("Error updating quantity!");
+        //     });
+        // }
 
         // Delete item
         function deleteItem(id) {
@@ -387,31 +398,31 @@ $stmt->close();
         updateTotals();
 
 
-//         // Update quantity
-// function updateQuantity(id, action) {
-//     fetch('update_cart.php', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-//         body: `id=${id}&action=${action}`
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//         if (data.success) {
-//             const cartItem = document.querySelector(`.cart-item[data-id="${id}"]`);
-//             cartItem.querySelector('input').value = data.quantity;
-//             cartItem.querySelector('.price').innerText = `Rs. ${data.totalPrice}`;
-//             document.getElementById('subtotal').innerText = `Rs. ${data.subtotal}`;
-//             document.getElementById('tax').innerText = `Rs. ${data.tax}`;
-//             document.getElementById('total').innerText = `Rs. ${data.total}`;
-//         } else {
-//             alert("Failed to update quantity!");
-//         }
-//     })
-//     .catch(err => {
-//         console.error(err);
-//         alert("Error updating quantity!");
-//     });
-// }
+        // Update quantity
+function updateQuantity(id, action) {
+    fetch('update_cart.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${id}&action=${action}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const cartItem = document.querySelector(`.cart-item[data-id="${id}"]`);
+            cartItem.querySelector('input').value = data.quantity;
+            cartItem.querySelector('.price').innerText = `Rs. ${data.totalPrice}`;
+            document.getElementById('subtotal').innerText = `Rs. ${data.subtotal}`;
+            document.getElementById('tax').innerText = `Rs. ${data.tax}`;
+            document.getElementById('total').innerText = `Rs. ${data.total}`;
+        } else {
+            alert("Failed to update quantity!");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error updating quantity!");
+    });
+}
 
 
 

@@ -57,7 +57,7 @@ class PDF extends FPDF
         $this->Cell(0, 10, 'SpicyMonk', 0, 1, 'L');
         $this->SetFont('Arial', '', 10);
         $this->SetTextColor(0, 0, 0);
-        $this->Cell(0, 5, 'Pimple Nilakh, Pune, Maharashtra', 0, 1, 'L');
+        $this->Cell(0, 5, '123 Food Street, Delhi, India', 0, 1, 'L');
         $this->Ln(10);
     }
 
@@ -69,7 +69,7 @@ class PDF extends FPDF
         $this->Cell(0, 10, 'TERMS & CONDITIONS', 0, 1, 'L');
         $this->SetFont('Arial', '', 10);
         $this->SetTextColor(0, 0, 0);
-        $this->MultiCell(0, 5, "Thank you for choosing SpicyMonk! We use fresh ingredients to deliver the best flavors.\nFor any issues or feedback, please contact us at support@spicymonk.com.\nAll sales are final. No refunds after food has been prepared.", 0, 'L');
+        $this->MultiCell(0, 5, "Payment is due within 15 days.\nState Bank of India\nAccount Number: 12345678\nRouting Number: 09876543210", 0, 'L');
     }
 }
 
@@ -126,6 +126,12 @@ $pdf->SetFont('Arial', 'B', 14);
 $pdf->SetTextColor(0, 128, 0);
 $pdf->Cell(150, 10, 'INVOICE TOTAL', 0, 0, 'R');
 $pdf->Cell(40, 10, number_format($total, 2), 0, 1, 'R');
+
+// Signature
+$pdf->Ln(15);
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(0, 10, '___________________________', 0, 1, 'R');
+$pdf->Cell(0, 5, 'Authorized Signature', 0, 1, 'R');
 
 $pdf->Output();
 ?>
