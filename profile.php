@@ -10,6 +10,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user'] !== true) {
 
 if(isset($_SESSION['tick']) && $_SESSION['tick']==true)
 {
+
+
     header("Location: profiledesign.php");
     exit();
 }
@@ -52,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
        header("Location: profiledesign.php");
         $_SESSION['user'] = true;
         $_SESSION['useremail'] = $email;
+        exit();
 
      } else {
         $_SESSION['user'] = false;
@@ -72,6 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 }
 }
+
+header('Location: loginauth.php');
 
 $conn->close();
 

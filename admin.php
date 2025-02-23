@@ -1,6 +1,44 @@
 
 <?php
 
+
+// if (isset($_POST['submit'])) {
+
+//   $host = "localhost";
+// $username = "root";
+// $password = "abhi879687#";
+// $database = "spicymonk";
+
+// $conn = new mysqli($host, $username, $password, $database);
+
+// if ($conn->connect_error) {
+//     die("Connection failed: " . $conn->connect_error);
+// }
+
+//     $email = $_POST['email'];
+//     $password = $_POST['password'];
+
+//     $stmt = $conn->prepare("SELECT * FROM admins WHERE user_email = ? AND user_password = ?");
+//     $stmt->bind_param("ss", $email, $password);
+//     $stmt->execute();
+    
+//     $result = $stmt->get_result();
+
+//     if ($result->num_rows > 0) {
+//       header("Location: dashboard.php");
+//     } else {
+//        echo "<script>alert('Enter correct details');</script>";
+//     }
+
+//     $stmt->close();
+//     $conn->close();
+// }
+
+
+
+
+
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // Database
 $host = "localhost"; 
@@ -28,14 +66,13 @@ if ($conn->connect_error) {
     if ($result->num_rows > 0) {
         
         $_SESSION['admin'] = $email;
-
+        $_SESSION['adminwarning'] = false;
         // Redirect 
-        header("Location: index.php");
-        echo "<script>console.log('success');</script>";
+        header("Location: dashboard.php");
         exit();
     } else {
-        header("Location: loginauth.php");
-        exit();
+      $_SESSION['adminwarning'] = true;
+      
     }
 
     $stmt->close();
@@ -127,8 +164,6 @@ if(!isset($_SESSION['access_token']))
      <span>Google</span>
    </button>';
  
-
-  $_SESSION['user'] = true;
 }
 
 ?>
@@ -371,6 +406,8 @@ body{
     <span>Sign In</span>
   </button>
 </form>
+<span class="subtitle" id="warn" style="color:red; display:none;"><i class="fa-solid fa-triangle-exclamation"></i> Invalid Email and Password</span>
+
 <span class="subtitle">User sign In? <a href="loginauth.php">Sign In</a></span>
   <div class="separator">
     <hr class="line">
@@ -380,6 +417,17 @@ body{
   <p class="note">Terms of use &amp; Conditions</p>
 </div>
 
+<?php
+    if (isset($_SESSION['adminwarning']) && $_SESSION['adminwarning'] == true) {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('warn').style.display = 'block';
+            });
+        </script>";
+        // Clear the warning session variable so it doesn’t persist on refresh
+        unset($_SESSION['adminwarning']);
+    }
+    ?>
 
 
 <script src="main.js"></script>

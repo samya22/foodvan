@@ -22,12 +22,14 @@ $result = $conn->query($sql);
 if(isset($_GET['search-result'])){
     if($_GET['search-result']!==""){
 
+        $_SESSION['serch-value-fetch']=$_GET['search-result'];
         $stmt = $conn->prepare("SELECT * FROM products WHERE title LIKE ?");
         $searchValue = '%'.$_GET['search-result'] . '%'; 
         $stmt->bind_param("s", $searchValue);
         $stmt->execute();
         
     }else{
+        $_SESSION['serch-value-fetch']="";
         $stmt = $conn->prepare("SELECT * FROM products");
         $stmt->execute();
     }
@@ -87,7 +89,7 @@ if(isset($_GET['search-result'])){
   max-width: 200px;
   background: #e3f4e8;
   /* border: 1px solid #b2d8c6; */
-  border-radius: 10px;
+  border-radius: 100px;
   padding: 15px;
   text-align: center;
   box-shadow: 0 4px 8px rgba(30, 30, 30, 0.1);
@@ -181,7 +183,87 @@ if(isset($_GET['search-result'])){
   }
 }
 
+/* Centering the switch */
+.option-name-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 5px 0;
+}
+
+/* Compact Filter Switch */
+.option-name-switch {
+  border: 1.5px solid rgb(59, 186, 103);
+  border-radius: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  width: 75%;
+  max-width: 280px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+/* Hide radio buttons */
+.option-name-switch input {
+  display: none;
+}
+
+/* Labels for options */
+.option-name-switch label {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 0; /* Increased padding to prevent text overlap */
+  position: relative;
+  z-index: 2; /* Ensures text is above background */
+  transition: all 0.3s;
+}
+
+/* Background for selected option */
+.option-name-background {
+  position: absolute;
+  width: 32%;
+  height: 26px;
+  background-color:rgb(159, 217, 169);
+  top: 4px;
+  left: 4px;
+  border-radius: 20px;
+  transition: left 0.3s ease-in-out;
+  z-index: 1; /* Moves background behind text */
+}
+
+/* Move background when Veg is selected */
+#option-name-2:checked ~ .option-name-background {
+  left: 34%;
+}
+
+/* Move background when Non-Veg is selected */
+#option-name-3:checked ~ .option-name-background {
+  left: 68%;
+}
+
+/* Selected option styling */
+#option-name-1:checked + label,
+#option-name-2:checked + label,
+#option-name-3:checked + label {
+  color:rgb(35, 54, 42);
+  font-weight: bold;
+}
+
+/* Unselected option styling */
+.option-name-switch label {
+  color: #7d7d7d;
+}
+
+
 </style>
+
+
 </head>
 
 <body class="body-fixed">
@@ -207,6 +289,24 @@ include 'header.php';
                                 </div>
                             </div>
                         </div>
+
+    
+
+                        <div class="option-name-container">
+    <div id="option-name-filter" class="option-name-switch">
+    <input checked id="option-name-1" name="menu-options" type="radio" onchange="fetchMenu('all')" />
+<label for="option-name-1">All</label>
+
+<input id="option-name-2" name="menu-options" type="radio" onchange="fetchMenu('veg')" />
+<label for="option-name-2">Veg</label>
+
+<input id="option-name-3" name="menu-options" type="radio" onchange="fetchMenu('non veg')" />
+<label for="option-name-3">Non Veg</label>
+
+        <span class="option-name-background"></span>
+    </div>
+</div>
+
                
                         <section class="product-section">
   <div class="product-container">
@@ -275,6 +375,10 @@ include 'header.php';
 
     if (isset($_GET['cardValue'])) {
     
+        if(isset($_SESSION['serch-value-fetch'])){
+            unset( $_SESSION['serch-value-fetch']);
+          }
+
         $cardValue = $_GET['cardValue'];
 
 
@@ -309,6 +413,8 @@ include 'header.php';
                                 </div>
                             </div>
                         </div>
+
+
                         <div class="menu-list-row">
                             <div class="row g-xxl-5 bydefault_show" id="menu-dish">
 
@@ -363,7 +469,6 @@ include 'header.php';
                 }
                 $conn->close();
                 ?>
-
 
                             </div>
                         </div>
@@ -522,6 +627,9 @@ function addToCart(button) {
 
 </script>
 
+
+
+
     <!-- Scripts Spicy Monk -->
     <script src="assets/js/jquery-3.5.1.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
@@ -537,7 +645,30 @@ function addToCart(button) {
     <script src="assets/js/smooth-scroll.js"></script>
     <script src="main.js"></script>
 
-    
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    function fetchMenu(type) {
+        let menuContainer = document.getElementById("menu-dish");
+        if (!menuContainer) {
+            console.error("Error: #menu-dish not found in DOM.");
+            return;
+        }
+
+        fetch("fetch_menu.php?type=" + type)
+            .then(response => response.text())
+            .then(data => {
+                menuContainer.innerHTML = data;
+            })
+            .catch(error => console.error("Error fetching menu:", error));
+    }
+
+    document.getElementById("option-name-1")?.addEventListener("change", () => fetchMenu("all"));
+    document.getElementById("option-name-2")?.addEventListener("change", () => fetchMenu("veg"));
+    document.getElementById("option-name-3")?.addEventListener("change", () => fetchMenu("nonveg"));
+});
+</script>
+
 
 </body>
 

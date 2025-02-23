@@ -1,5 +1,8 @@
 <?php
 session_start();
+if(isset($_SESSION['serch-value-fetch'])){
+  unset( $_SESSION['serch-value-fetch']);
+}
 ?>
 
 <!DOCTYPE html>

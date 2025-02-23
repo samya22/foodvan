@@ -1,6 +1,8 @@
 <?php
 session_start();
- 
+if(isset($_SESSION['serch-value-fetch'])){
+    unset( $_SESSION['serch-value-fetch']);
+  }
 
 // Check if the user is logged in and email is set in the session
 if (isset($_SESSION['useremail'])) {
@@ -197,6 +199,8 @@ include 'header.php';
                                 </div>
                             </div>
                         </div>
+
+                        
                         <div class="menu-list-row">
                             <div class="row g-xxl-5 bydefault_show" id="menu-dish">
                                 <div class="col-lg-4 col-sm-6 dish-box-wp breakfast" data-cat="breakfast">
@@ -297,7 +301,7 @@ include 'header.php';
                                             <ul>
                                                 <li>
                                                     <p>Type</p>
-                                                    <b>Veg</b>
+                                                    <b>Non Veg</b>
                                                 </li>
                                                 <li>
                                                     <p>Persons</p>
@@ -419,7 +423,7 @@ include 'header.php';
                                             <ul>
                                                 <li>
                                                     <p>Type</p>
-                                                    <b>Veg</b>
+                                                    <b>Non Veg</b>
                                                 </li>
                                                 <li>
                                                     <p>Persons</p>
@@ -798,36 +802,79 @@ include 'header.php';
 
             
 
+            <?php
+$host = "localhost";
+$username = "root";
+$password = "abhi879687#";
+$database = "spicymonk";
 
-            <div class="bg-pattern bg-light repeat-img"
-                style="background-image: url(assets/images/blog-pattern-bg.png);">
+$conn = new mysqli($host, $username, $password, $database);
 
-                <section class="newsletter-sec section pt-0">
-                    <div class="sec-wp">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-lg-8 m-auto">
-                                    <div class="newsletter-box text-center back-img white-text"
-                                        style="background-image: url(assets/images/bt3.jpg);">
-                                        <div class="bg-overlay dark-overlay"></div>
-                                        <div class="sec-wp">
-                                            <div class="newsletter-box-text">
-                                                <h2 class="h2-title">Subscribe our newsletter</h2>
-                                                <p>Subscribe now to receive updates, offers delivered straight to your inbox.</p>
-                                            </div>
-                                            <form action="#" class="newsletter-form">
-                                                <input type="email" class="form-input"
-                                                    placeholder="Enter your Email Here" required>
-                                                <button type="submit" class="sec-btn primary-btn">Submit</button>
-                                            </form>
-                                        </div>
-                                    </div>
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$message = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST["email"];
+
+    $stmt = $conn->prepare("SELECT * FROM subscribers WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $message = "You are already subscribed!";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO subscribers (email) VALUES (?)");
+        $stmt->bind_param("s", $email);
+
+        if ($stmt->execute()) {
+            $message = "Subscription Successful!";
+        } else {
+            $message = "Failed to Subscribe!";
+        }
+    }
+
+    $stmt->close();
+}
+
+
+$conn->close();
+?>
+
+<div class="bg-pattern bg-light repeat-img"
+    style="background-image: url(assets/images/blog-pattern-bg.png);">
+    <section class="newsletter-sec section pt-0">
+        <div class="sec-wp">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 m-auto">
+                        <div class="newsletter-box text-center back-img white-text"
+                            style="background-image: url(assets/images/bt3.jpg);">
+                            <div class="bg-overlay dark-overlay"></div>
+                            <div class="sec-wp">
+                                <div class="newsletter-box-text">
+                                    <h2 class="h2-title">Subscribe to our newsletter</h2>
+                                    <p>Subscribe now to receive updates, offers delivered straight to your inbox.</p>
                                 </div>
+                                <form action="" method="POST" class="newsletter-form">
+                                    <input type="email" class="form-input" name="email"
+                                        placeholder="Enter your Email Here" required>
+                                    <button type="submit" class="sec-btn primary-btn">Submit</button>
+                                </form>
+                        
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
             </div>
+        </div>
+        <?php if (!empty($message)) echo "<center><p style='color:green;'>$message</p></center>"; ?>
+    </section>
+</div>
+
 
            <!-- Footer Start -->
 <div class="footer-5-column">
@@ -974,7 +1021,7 @@ function addToCart(button) {
     })
     .then((response) => response.text())
     .then((data) => {
-        alert(data); // Show success or error message from PHP
+         // Show success or error message from PHP
         window.location.href="cart.php";
     })
     .catch((error) => {

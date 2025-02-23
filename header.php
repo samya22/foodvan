@@ -61,7 +61,7 @@ if (isset($_SESSION['useremail'])) {
                         </nav>
                         <div class="header-right">
                             <form action="menu.php" class="header-search-form for-des">
-                                <input type="search" name="search-result" class="form-input" placeholder="Search Here...">
+                                <input type="search" name="search-result" class="form-input" placeholder="Search Here..."   >
                                 <button type="submit">
                                     <i class="uil uil-search"></i>
                                 </button>
