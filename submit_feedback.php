@@ -24,9 +24,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssis", $name, $email, $phone, $message);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Feedback submitted successfully!');</script>";
+        showNotification("Success!", "Feedback submitted");
     } else {
-        echo "<script>alert('Submission failed!');</script>";
+        showNotification("Failed!", "Failed submission");
     }
     
     $stmt->close();

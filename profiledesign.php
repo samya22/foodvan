@@ -1,4 +1,6 @@
 <?php
+ include 'notification.php'; 
+
 session_start();
 if(isset($_SESSION['serch-value-fetch'])){
     unset( $_SESSION['serch-value-fetch']);
@@ -32,7 +34,6 @@ $email = $_SESSION['useremail'];
 echo "<script>console.log('Session email: " . $email . "');</script>";
 
 $email = $_SESSION['useremail'];
-
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
     $firstname = $_POST['firstname'];
@@ -40,35 +41,49 @@ if (isset($_POST['submit'])) {
     $address = $_POST['address'];
     $contact = $_POST['contact'];
 
-    // Update query
-    $sql = "UPDATE user_details SET username = ?, firstname = ?, lastname = ?, Uaddress = ?, contact = ? WHERE email = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssss", $username, $firstname, $lastname, $address, $contact, $email);
-    $stmt->execute();
+    // Check if email exists
+    $sql_check = "SELECT email FROM user_details WHERE email = ?";
+    $stmt_check = $conn->prepare($sql_check);
+    $stmt_check->bind_param("s", $email);
+    $stmt_check->execute();
+    $stmt_check->store_result();
 
-    // Check if rows were affected; if not, insert new data
-    if ($stmt->affected_rows === 0) {
+    if ($stmt_check->num_rows > 0) {
+        // Email exists, update the record
+        $sql_update = "UPDATE user_details SET username = ?, firstname = ?, lastname = ?, Uaddress = ?, contact = ? WHERE email = ?";
+        $stmt_update = $conn->prepare($sql_update);
+        $stmt_update->bind_param("ssssss", $username, $firstname, $lastname, $address, $contact, $email);
+        $stmt_update->execute();
+
+        if ($stmt_update->affected_rows > 0) {
+            showNotification("Success!", "Profile Successfully Updated");
+        } else {
+            showNotification("No Changes", "No changes were made to your profile.");
+        }
+        $stmt_update->close();
+    } else {
+        // Email does not exist, insert new record
         $sql_insert = "INSERT INTO user_details (username, firstname, lastname, Uaddress, contact, email) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt_insert = $conn->prepare($sql_insert);
         $stmt_insert->bind_param("ssssss", $username, $firstname, $lastname, $address, $contact, $email);
         $stmt_insert->execute();
+
         if ($stmt_insert->affected_rows > 0) {
-            echo "<script>alert('No existing record found. A new profile has been created successfully!');</script>";
+            showNotification("Success!", "A new profile has been created successfully!");
         } else {
-            echo "<script>alert('Failed to create a new profile. Please try again later.');</script>";
+            showNotification("Failed!", "Failed to create a new profile. Please try again later.");
         }
         $stmt_insert->close();
-    } else {
-        echo "<script>alert('Profile updated successfully!');</script>";
     }
-    $stmt->close();
+    $stmt_check->close();
 }
+
 if (isset($_POST['securitysubmit'])) {
     $newPassword = $_POST['newPassword'];
     $confirmPassword = $_POST['confirmPassword'];
 
     // Ensure new password and confirm password match
-    if ($newPassword === $confirmPassword) {
+    if ($newPassword === $confirmPassword && $newPassword!=="" && $confirmPassword!=="") {
 
         $hashpass=password_hash($newPassword, PASSWORD_BCRYPT);
         // Update the password directly in the database

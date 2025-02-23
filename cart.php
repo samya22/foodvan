@@ -388,12 +388,14 @@ $stmt->close();
                     document.querySelector(`.cart-item[data-id="${id}"]`).remove();
                     updateTotals();
                 } else {
-                    alert("Failed to delete item!");
+                    // alert("Failed to delete item!");
+                    windows.location.href='error.php';
                 }
             })
             .catch(err => {
-                console.error(err);
-                alert("Error deleting item!");
+                // console.error(err);
+                // alert("Error deleting item!");
+                windows.location.href='error.php';
             });
         }
 
@@ -418,12 +420,14 @@ function updateQuantity(id, action) {
             document.getElementById('tax').innerText = `Rs. ${data.tax}`;
             document.getElementById('total').innerText = `Rs. ${data.total}`;
         } else {
-            alert("Failed to update quantity!");
+            // alert("Failed to update quantity!");
+            windows.location.href='error.php';
         }
     })
     .catch(err => {
         console.error(err);
-        alert("Error updating quantity!");
+        // alert("Error updating quantity!");
+        windows.location.href='error.php';
     });
 }
 
