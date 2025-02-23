@@ -32,6 +32,41 @@ $keySecret = 'z5Md1mAEj5P7kdiIU9WuwUUU'; // Replace with your Razorpay Key Secre
 
 if (isset($_GET['amtvalue'])) {
 
+// 🔹 Define an array to store out-of-stock items
+$outOfStockItems = [];
+
+// 🔹 Get all cart items for the logged-in user
+$sql = "SELECT title, quantity FROM cart WHERE email = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $useremail);
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($cartItem = $result->fetch_assoc()) {
+    $cartTitle = $cartItem['title'];
+    $cartQuantity = $cartItem['quantity'];
+
+    // 🔹 Check stock for the same title in inventory
+    $sqlStock = "SELECT stock FROM inventory WHERE title = ?";
+    $stmtStock = $conn->prepare($sqlStock);
+    $stmtStock->bind_param("s", $cartTitle);
+    $stmtStock->execute();
+    $stockResult = $stmtStock->get_result()->fetch_assoc();
+    $availableStock = $stockResult['stock'] ?? 0;
+    $stmtStock->close();
+
+    // 🔹 If cart quantity exceeds stock, store title in array
+    if ($cartQuantity > $availableStock) {
+        $outOfStockItems[] = $cartTitle;
+    }
+}
+
+// 🔹 Check if any items are out of stock
+if (!empty($outOfStockItems)) {
+    include 'notification.php';
+    showNotification("OUT OF STOCK", implode(", ", $outOfStockItems));
+    
+}else{
 
 $userEmail = $_SESSION['useremail']; // Get the logged-in user's email
 $query = "SELECT username, contact FROM user_details WHERE email = ?";
@@ -108,6 +143,7 @@ $order_id = "ODD0" . rand(100000, 999999); // Random Order ID
             </script>
         ";
     
+}
 }
 
 
@@ -389,13 +425,13 @@ $stmt->close();
                     updateTotals();
                 } else {
                     // alert("Failed to delete item!");
-                    windows.location.href='error.php';
+                    window.location.href='error.php';
                 }
             })
             .catch(err => {
                 // console.error(err);
                 // alert("Error deleting item!");
-                windows.location.href='error.php';
+                window.location.href='error.php';
             });
         }
 
@@ -419,15 +455,16 @@ function updateQuantity(id, action) {
             document.getElementById('subtotal').innerText = `Rs. ${data.subtotal}`;
             document.getElementById('tax').innerText = `Rs. ${data.tax}`;
             document.getElementById('total').innerText = `Rs. ${data.total}`;
+         
         } else {
             // alert("Failed to update quantity!");
-            windows.location.href='error.php';
+             window.location.href='error.php';
         }
     })
     .catch(err => {
         console.error(err);
         // alert("Error updating quantity!");
-        windows.location.href='error.php';
+        window.location.href='error.php';
     });
 }
 

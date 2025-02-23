@@ -21,6 +21,7 @@ $id = intval($_POST['id']);
 $action = $_POST['action'];
 $useremail = $_SESSION['useremail'];
 
+
 if ($action === 'increment') {
     $sql = "UPDATE cart SET quantity = quantity + 1 WHERE id = ? AND email = ?";
 } elseif ($action === 'decrement') {
