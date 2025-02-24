@@ -19,29 +19,41 @@ if ($conn->connect_error) {
 // Handle status update request
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST["order_id"])) {
-        $order_id_str = $_POST["order_id"]; // This is the 'order_id' from orders (VARCHAR)
+        $order_id_str = $_POST["order_id"];
 
-        // 🔹 Get the corresponding 'id' from orders table
-        $stmt = $conn->prepare("SELECT id FROM orders WHERE order_id = ?");
-        $stmt->bind_param("s", $order_id_str); 
+        // 🔹 Get order details (id, email)
+        $stmt = $conn->prepare("SELECT id, email FROM orders WHERE order_id = ?");
+        $stmt->bind_param("s", $order_id_str);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-
+    
         if (!$result) {
-            echo "error"; // Order not found
+            echo "error";
             exit();
         }
-
-        $order_status_id = $result['id']; // INT from orders.id
-
+    
+        $order_status_id = $result['id']; 
+        $user_email = $result['email']; 
+    
         // 🔹 Update order_status table
         $stmt = $conn->prepare("UPDATE order_status SET status = 'done' WHERE order_id = ?");
         $stmt->bind_param("i", $order_status_id);
         $success = $stmt->execute();
         $stmt->close();
-
-        echo $success ? "success" : "error";
+    
+        if ($success) {
+            // 🔹 Insert notification into usernotification table
+            $message = "Order is ready! 🍜  ORDER ID: #".$order_id_str;
+            $stmt = $conn->prepare("INSERT INTO usernotification (email, message) VALUES (?, ?)");
+            $stmt->bind_param("ss", $user_email, $message);
+            $stmt->execute();
+            $stmt->close();
+    
+            echo "success";
+        } else {
+            echo "error";
+        }
         exit();
     }
 
@@ -84,6 +96,50 @@ while ($row = $result->fetch_assoc()) {
 $inventory_sql = "SELECT id, title FROM inventory WHERE stock = 0";
 $inventory_result = $conn->query($inventory_sql);
 $inventory_items = $inventory_result->fetch_all(MYSQLI_ASSOC);
+
+
+
+
+if (isset($_POST["order_id"])) {
+    $order_id_str = $_POST["order_id"];
+
+    // Get corresponding 'id' from orders table
+    $stmt = $conn->prepare("SELECT id, email FROM orders WHERE order_id = ?");
+    $stmt->bind_param("s", $order_id_str);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$result) {
+        echo "error";
+        exit();
+    }
+
+    $order_status_id = $result['id']; 
+    $user_email = $result['email']; 
+
+    // Update order_status to 'done'
+    $stmt = $conn->prepare("UPDATE order_status SET status = 'done' WHERE order_id = ?");
+    $stmt->bind_param("i", $order_status_id);
+    $success = $stmt->execute();
+    $stmt->close();
+
+    if ($success) {
+        // Insert notification into usernotification table
+        $message = "Order is ready! 🍜";
+        $stmt = $conn->prepare("INSERT INTO usernotification (email, message) VALUES (?, ?)");
+        $stmt->bind_param("ss", $user_email, $message);
+        $stmt->execute();
+        $stmt->close();
+
+        echo "success";
+    } else {
+        echo "error";
+    }
+    exit();
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -250,6 +306,7 @@ $inventory_items = $inventory_result->fetch_all(MYSQLI_ASSOC);
         });
     });
 </script>
+
 
 </body>
 </html>
