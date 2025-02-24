@@ -433,7 +433,7 @@ include 'header.php';
                 Message
                 <textarea class="cs-input cs-textarea" required name="Message" id="message-1150" placeholder="Write message..."></textarea>
             </label>
-            <button class="cs-button-solid cs-submit" type="submit">Make an Appointment</button>
+            <button class="cs-button-solid cs-submit" type="submit">Submit</button>
         </form>
         <!--Bounce Graphic-->
         <img class="cs-graphic cs-graphic1" loading="lazy" decoding="async" src="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/MISC/bounce.svg" alt="bounce" width="208" height="124">

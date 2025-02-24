@@ -13,6 +13,7 @@ if ($conn->connect_error) {
 
 $type = isset($_GET['type']) ? $_GET['type'] : 'all';
 $searchValue = isset($_SESSION['serch-value-fetch']) ? $_SESSION['serch-value-fetch'] : '';
+$categorySelected = isset($_SESSION['categoryselected']) ? $_SESSION['categoryselected'] : '';
 
 $sql = "SELECT image_path, rating, title, description, type, persons, price FROM products";
 $conditions = [];
@@ -31,6 +32,13 @@ if (!empty($searchValue)) {
     $conditions[] = "title LIKE ?";
     $types .= "s";
     $params[] = "%$searchValue%";
+}
+
+// Add category filter, but exclude if "All Menus" is selected
+if (!empty($categorySelected) && $categorySelected !== "All Menus") {
+    $conditions[] = "category = ?";
+    $types .= "s";
+    $params[] = $categorySelected;
 }
 
 // Combine conditions in SQL
@@ -65,10 +73,9 @@ if ($result->num_rows > 0) {
     }
 } else {
     echo "<p style='position:absolute; left:640px;'><i class='fa-solid fa-seedling'></i> No products available</p>";
-
 }
 
 $stmt->close();
 $conn->close();
-
 ?>
+<!-- all menus new -->

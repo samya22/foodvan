@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+$_SESSION['categoryselected']="All Menus";
 
 // Database connection
 $host = "localhost"; 
@@ -381,6 +382,7 @@ include 'header.php';
 
         $cardValue = $_GET['cardValue'];
 
+        $_SESSION['categoryselected']=$cardValue;
 
         if($cardValue=="All Menus"){
             $stmt = $conn->prepare("SELECT * FROM products");
@@ -648,6 +650,7 @@ function addToCart(button) {
 
     <script>
 document.addEventListener("DOMContentLoaded", function () {
+
     function fetchMenu(type) {
         let menuContainer = document.getElementById("menu-dish");
         if (!menuContainer) {

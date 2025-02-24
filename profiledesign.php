@@ -218,6 +218,7 @@ input.form-control::selection {
             <a class="nav-link active ms-0" href="#"><i class="fa-solid fa-user"></i> Profile</a>
             <a class="nav-link active ms-0" href="index.php"><i class="fa-solid fa-bell-concierge"></i> Home</a>
             <a class="nav-link active ms-0" href="OrdersHistory.php"> <i class="fa-solid fa-circle-xmark"></i> Orders</a>
+            <a class="nav-link active ms-0" href="usernotify.php"> <i class="fa-solid fa-circle-xmark"></i> Notifications</a>
             <a class="nav-link active ms-0" href="logout.php"> <i class="fa-solid fa-circle-xmark"></i> Logout</a>
            
         </nav>
