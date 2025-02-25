@@ -152,6 +152,62 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_id'])) {
     <!-- NAVBAR -->
     <nav>
         <i class='bx bx-menu'></i>
+        <?php
+$host = "localhost";  
+$username = "root";  
+$password = "abhi879687#";  
+$database = "spicymonk";  
+
+$conn = new mysqli($host, $username, $password, $database);  
+
+if ($conn->connect_error) {  
+    die("Connection failed: " . $conn->connect_error);  
+}
+
+// Fetch current status
+$sql = "SELECT status FROM cart_status LIMIT 1";
+$result = $conn->query($sql);
+$status = ($result->num_rows > 0) ? $result->fetch_assoc()['status'] : 'close';
+
+?>
+
+<!-- Toggle Switch -->
+<div style="display: flex; align-items: center; gap: 10px;">
+    <span id="toggleText" style="font-weight: bold;">
+        <?php echo ($status == 'open') ? 'Close Cart' : 'Open Cart'; ?>
+    </span>
+    <label style="position: relative; display: inline-block; width: 50px; height: 25px;">
+        <input type="checkbox" id="cartToggle" 
+               style="opacity: 0; width: 0; height: 0;" 
+               <?php echo ($status == 'open') ? 'checked' : ''; ?>>
+        <span id="toggleBackground" 
+              style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+                     background-color: <?php echo ($status == 'open') ? '#4CAF50' : '#ccc'; ?>;
+                     transition: .4s; border-radius: 25px;">
+            <span id="toggleCircle" 
+                  style="position: absolute; height: 18px; width: 18px; left: 4px; bottom: 4px; 
+                         background-color: white; transition: .4s; border-radius: 50%;
+                         transform: <?php echo ($status == 'open') ? 'translateX(25px)' : 'none'; ?>;">
+            </span>
+        </span>
+    </label>
+</div>
+
+<script>
+document.getElementById('cartToggle').addEventListener('change', function() {
+    let status = this.checked ? 'open' : 'close';
+
+    fetch('update_cart_status.php?status=' + status)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('toggleText').innerText = (status === 'open') ? 'Close Cart' : 'Open Cart';
+            document.getElementById('toggleBackground').style.backgroundColor = (status === 'open') ? '#4CAF50' : '#ccc';
+            document.getElementById('toggleCircle').style.transform = (status === 'open') ? 'translateX(25px)' : 'translateX(0px)';
+        });
+});
+</script>
+
+
     </nav>
     <!-- NAVBAR -->
 
