@@ -14,6 +14,19 @@ session_start();
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
+
+    
+$sql = "SELECT status FROM cart_status LIMIT 1";
+$result = $conn->query($sql);
+$status = ($result->num_rows > 0) ? $result->fetch_assoc()['status'] : 'close';
+
+
+// Redirect to home if cart is open
+if ($status == 'close') {
+    header("Location: not_available.php");
+    exit();
+}
+
     
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Decode JSON input

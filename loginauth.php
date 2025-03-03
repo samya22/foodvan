@@ -392,11 +392,11 @@ $_SESSION['user'] = true;
 <span class="subtitle">Don't have an Account? <a href="signup.php">Signup</a></span>
   <div class="separator">
     <hr class="line">
-    <span>Or</span>
+    <!-- <span>Or</span> -->
     <hr class="line">
   </div>
  <?php
-    echo $login_button;
+    // echo $login_button;
  ?>
   <p class="note">Terms of use &amp; Conditions</p>
 </div>

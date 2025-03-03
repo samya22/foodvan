@@ -442,6 +442,19 @@ include 'header.php';
     </div>
 </section>
 
+<?php
+include 'notification.php';
+if(isset($_SESSION['feedback']) && $_SESSION['feedback'] == true){
+        showNotification("Success!", "Feedback submitted");
+        unset($_SESSION['feedback']);
+}
+
+if(isset($_SESSION['feedback']) && $_SESSION['feedback'] == false){
+    showNotification("Failed!", "Failed submission");
+    unset($_SESSION['feedback']);
+}
+
+?>
     
      <!-- Footer Start -->
 <div class="footer-5-column">

@@ -349,11 +349,11 @@ if(!isset($_SESSION['access_token']))
 <span class="subtitle">Already have an Account? <a href="loginauth.php">Sign In</a></span>
   <div class="separator">
     <hr class="line">
-    <span>Or</span>
+    <!-- <span>Or</span> -->
     <hr class="line">
   </div>
  <?php
-    echo $login_button;
+    // echo $login_button;
  ?>
   <p class="note">Terms of use &amp; Conditions</p>
 </div>

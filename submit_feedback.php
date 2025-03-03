@@ -1,10 +1,13 @@
+
 <?php
+session_start();
 // Database connection
 $host = "localhost";
 $username = "root";
 $password = "abhi879687#";
 $database = "spicymonk";
 
+include 'notification.php';
 $conn = new mysqli($host, $username, $password, $database);
 
 if ($conn->connect_error) {
@@ -25,10 +28,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->execute()) {
         showNotification("Success!", "Feedback submitted");
+        $_SESSION['feedback'] = true;
+       header("Location: contact.php");
     } else {
         showNotification("Failed!", "Failed submission");
+        $_SESSION['feedback'] = false;
+        header("Location: contact.php");
     }
-    
+
     $stmt->close();
 }
 

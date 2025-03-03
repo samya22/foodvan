@@ -411,7 +411,7 @@ body{
 <span class="subtitle">User sign In? <a href="loginauth.php">Sign In</a></span>
   <div class="separator">
     <hr class="line">
-    <span>Or</span>
+    <!-- <span>Read</span> -->
     <hr class="line">
   </div>
   <p class="note">Terms of use &amp; Conditions</p>

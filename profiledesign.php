@@ -62,11 +62,15 @@ if (isset($_POST['submit'])) {
         }
         $stmt_update->close();
     } else {
+      try{
         // Email does not exist, insert new record
         $sql_insert = "INSERT INTO user_details (username, firstname, lastname, Uaddress, contact, email) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt_insert = $conn->prepare($sql_insert);
         $stmt_insert->bind_param("ssssss", $username, $firstname, $lastname, $address, $contact, $email);
         $stmt_insert->execute();
+      }catch(Exception $e){
+          echo "<center><h1>Please enter data , Don't leave missing fields</h1></center>";
+      }
 
         if ($stmt_insert->affected_rows > 0) {
             showNotification("Success!", "A new profile has been created successfully!");

@@ -23,7 +23,7 @@ $status = ($result->num_rows > 0) ? $result->fetch_assoc()['status'] : 'close';
 // Redirect to home if cart is open
 if ($status == 'close') {
     header("Location: not_available.php");
-    exit;
+    exit();
 }
 
 // Check if user is logged in
