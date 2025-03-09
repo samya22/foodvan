@@ -818,7 +818,9 @@ $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
-
+if(preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/", $email) == 0){
+        $message = "Invalid Email!";
+}else{
     $stmt = $conn->prepare("SELECT * FROM subscribers WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -836,6 +838,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $message = "Failed to Subscribe!";
         }
     }
+}
 
     $stmt->close();
 }

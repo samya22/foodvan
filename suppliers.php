@@ -25,6 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
         $contact = $_POST['contact'];
 
+        if (preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/", $email) == 0) {
+            showNotification("Failed", "Invalid email format.");
+        }else{
+
+        if(strlen($contact) != 10) {
+            showNotification("Failed", "Contact number should be 10 digits.");
+            
+        }else{
+
         // Insert supplier
         $insertSql = "INSERT INTO suppliers (name, email, contact) VALUES ('$name', '$email', '$contact')";
         if ($conn->query($insertSql) === TRUE) {
@@ -32,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             showNotification("Failed", "Error: " . $conn->error);
         }
+    }//contact if
+
+}//filter if
     }
 
     if (isset($_POST['delete_supplier'])) {

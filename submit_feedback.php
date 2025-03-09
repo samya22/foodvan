@@ -21,6 +21,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = $_POST['phone'];
     $message = $_POST['Message']; // Case-sensitive
 
+    if(preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/", $email) == 0){
+        showNotification("Failed!", "Invalid email format");
+        $_SESSION['feedback'] = false;
+        header("Location: contact.php");
+
+}else{
     if(strlen($phone) != 10) {
         showNotification("Failed!", "Phone number must be 10 digits");
         $_SESSION['feedback'] = false;
@@ -41,6 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['feedback'] = false;
         header("Location: contact.php");
     }
+}
 
     $stmt->close();
 }
